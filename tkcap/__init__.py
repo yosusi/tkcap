@@ -8,19 +8,19 @@ MIT License
 Usage:
     import tkcap
 
-    cap = tkcap.CAP(master)     # master is an instance of tkinter
-    cap.capture(FileName)       # Capture and Save the screenshot of the tkiner window
+    cap = tkcap.CAP(master)  # 'master' is a tkinter window instance, passed to create a capture object
+    cap.capture(FileName)    # Captures a screenshot of the tkinter window and saves it as provided FileName
 
-    # If you want the x_pos, y_pos, width and height of the tkinter window.
+    # To retrieve the x, y coordinates, width, and height of the tkinter window
     region = cap.get_region()
 
-    # If you want to bind the key so that every time you press that key
-    # captures the screenshot. Here I have binded to "Control g"
+    # Bind a key (in this case, 'Control + g') to trigger a screenshot capture when pressed
+    # Each time 'Control + g' is pressed, the screenshot will be saved as provided FileName
     master.bind('<Control-g>', lambda: cap.capture(FileName))
 '''
 
 __all__ = ['CAP']
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 __author__ = 'ghanteyyy'
 
 import os
