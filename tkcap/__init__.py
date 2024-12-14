@@ -29,6 +29,7 @@ import subprocess
 import collections
 import tkinter as tk
 import tkinter.tix as tix
+from screeninfo import get_monitors
 from . import exceptions
 
 if sys.version_info.major < 3:
@@ -41,7 +42,7 @@ except ModuleNotFoundError:
     raise exceptions.TkCapException('tkcap is unable to import pyautogui. Please install pyautogui to use tkcap')
 
 
-Region = collections.namedtuple('Region', 'x y width height')
+box = collections.namedtuple('box', 'left upper right lower')
 
 
 class CAP:
@@ -53,15 +54,22 @@ class CAP:
         else:
             raise exceptions.TkCapException('master parameter was expected to be the instance of tkinter')
 
-    def get_region(self):
-        '''Get x-coordinate, y-coordinate, width and height of the tkinter window'''
+    def get_box(self):
+        '''Get left, upper, right and lower pixel coordinate'''
 
         self.master.update()
 
-        x_pos, y_pos = self.master.winfo_x() + 8, self.master.winfo_y() + 2
-        width, height = self.master.winfo_width(), self.master.winfo_height() + 29
+        minimum_x = 0
+        minimum_y = 0
+        for m in get_monitors():
+            minimum_x = min(minimum_x, m.x)
+            minimum_y = min(minimum_y, m.y)
+        left = self.master.winfo_x() - minimum_x + 8
+        right = self.master.winfo_x() + self.master.winfo_width() - minimum_x
+        upper = self.master.winfo_y() - minimum_y
+        lower = self.master.winfo_y() + self.master.winfo_height() - minimum_y + 29
 
-        return Region(x_pos, y_pos, width, height)
+        return box(left, upper, right, lower)
 
     def capture(self, imageFilename, overwrite=False, show=False):
         '''Capture and save screenshot of the tkinter window
@@ -84,7 +92,8 @@ class CAP:
         if overwrite and os.path.exists(path):
             os.remove(path)
 
-        pyautogui.screenshot(path, region=self.get_region())
+        screenshot = pyautogui.screenshot(allScreens=True).crop(self.get_box()) #region=self.get_region())
+        screenshot.save(path)
 
         if show:
             self.master.after(1100, lambda: subprocess.run([os.path.join(os.getenv('WINDIR'), 'explorer.exe'), '/select,', os.path.normpath(path)]))

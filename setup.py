@@ -19,7 +19,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/ghanteyyy/tkcap.git",
     packages=setuptools.find_packages(),
-    install_requires=['pyautogui'],
+    install_requires=['pyautogui', 'screeninfo'],
     license='MIT',
     include_package_data=True,
     classifiers=[
